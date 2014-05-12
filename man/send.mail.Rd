@@ -1,9 +1,10 @@
 \name{send.mail}
 \alias{send.mail}
-\title{Send emails from R to multiple recipients with attachments and SMTP authorization}
+\title{Send emails from R}
 \usage{
-send.mail(from, to, subject = "", body = "", smtp = list(),
-  authenticate = FALSE, send = TRUE, attach.files = NULL, ...)
+send.mail(from, to, subject = "", body = "", encoding = "iso-8859-1",
+  html = FALSE, inline = FALSE, smtp = list(), authenticate = FALSE,
+  send = TRUE, attach.files = NULL, ...)
 }
 \arguments{
   \item{from}{A valid email address of the sender.}
@@ -13,7 +14,19 @@ send.mail(from, to, subject = "", body = "", smtp = list(),
 
   \item{subject}{Subject of the email.}
 
-  \item{body}{Body of the email as text.}
+  \item{body}{Body of the email as text. If the parameter
+  body refers to an existing file location, the text of the
+  file is parsed as body of the email.}
+
+  \item{encoding}{Character encoding to use for the email.
+  Supported encodings include iso-8859-1 (default), utf-8,
+  us-ascii, and koi8-r.}
+
+  \item{html}{A boolean indicating whether the body of the
+  email should be parsed as HTML.}
+
+  \item{inline}{A boolean indicating whether images in the
+  HTML file should be embedded inline.}
 
   \item{smtp}{A list of configuration parameters to
   establish and authorize a connection with the SMTP
@@ -41,8 +54,7 @@ org.apache.commons.mail.SimpleEmail or
 org.apache.commons.mail.MultiPartEmail
 }
 \description{
-Send emails from R to multiple recipients with attachments
-and SMTP authorization
+Send emails from R
 }
 \details{
 The only mandatory value in the list 'smtp' is host.name
@@ -63,6 +75,11 @@ A description can be provided further as
 parameters must have the same length as 'attach.files'. In
 case attach.file is NULL, then these two parameters will be
 ignored.
+
+HTML formatted emails can be sent by setting the parameters
+html and inline (if embedding images) to TRUE. The body of
+the email can either be a HTML string or point to a HTML
+file in the local file system.
 }
 \note{
 For more examples, see https://github.com/rpremraj/mailR
