@@ -1,25 +1,36 @@
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/infuser)](https://cran.r-project.org/package=mailR)
+[![Downloads](http://cranlogs.r-pkg.org/badges/infuser)](https://cran.r-project.org/package=mailR)
+
 Overview
 ========
 mailR allows users to send emails from R.
 
-It is developed as a wrapper around [Apache Commons Email](http://commons.apache.org/proper/commons-email/) and offers several features to send emails from R such as:
+It is developed as a wrapper around Apache Commons Email and offers several features to send emails from R such as:
 - using authentication-based SMTP servers
 - sending emails to multiple recipients (including the use of Cc, Bcc, and ReplyTo recipients)
 - attaching multiple files from the file system or from URLs
 - sending HTML formatted emails with inline images
 
-What's new in verion 0.4
-------------------------
-**30th December 2014**
+Note: This is the new home for mailR. The previous repository [https://github.com/rpremraj/mailR](https://github.com/rpremraj/mailR) is discontinued.
 
-*Features*
-- Attach files to the email using URLs, e.g., you can send files from your Dropbox public folder using the URL.
-- A 'debug' parameter to set that will make send.mail() provide a detailed log.
-- Option to set a email address to reply to using the 'replyTo' parameter.
+What's new in version 0.8
+-------------------------
+**5th Nov 2021**
 
-*Enhancement*
-- Upgraded Commons Email Jar to version 1.3.3
-- Upgraded Javax.mail Jar to version 1.5.2
+*Fixes*
+- Added activation.jar dependency
+- Switched from deprecated function setSmtpPort to setSSLOnConnect when using SSL
+- Switched from deprecated function setTLS to setStartTLSEnabled when using SSL
+- Internal function .valid.email() actually works now!
+
+What's new in version 0.7 (Thank you, [sclewis23](https://github.com/sclewis23))
+-------------------------
+**24th August 2021**
+
+*Updates*
+- Upgraded Commons Email Jar to version 1.5
+- Upgraded Javax.mail Jar to version 1.6.2
+
 
 Installation instructions
 =========================
@@ -28,12 +39,12 @@ You can install the latest development version of mailR using devtools:
 ```R
 install.packages("devtools", dep = T)
 library(devtools)
-install_github("mailR", "rpremraj")
+install_github("rpremrajGit/mailR")
 
 library(mailR)
 ```
 
-The latest release of mailR is available on [CRAN](http://cran.r-project.org/web/packages/mailR/):
+The latest release of mailR is available on [CRAN](https://cran.r-project.org/package=mailR):
 
 ```R
 install.packages("mailR", dep = T)
@@ -130,9 +141,28 @@ send.mail(from = "sender@gmail.com",
 ```
 *send.mail expects the images in the HTML file to be referenced relative to the current working directory (something to improve upon in the future).*
 
+You can add headers to your emails by passing a named list called `headers`. Some mail clients allow defining rules based on email headers, where such a feature can come in handy.
+
+```R
+send.mail(from = "sender@gmail.com",
+          to = c("Recipient 1 <recipient1@gmail.com>", "recipient2@gmail.com"),
+          subject = "Subject of the email",
+          body = "Body of the email",
+          smtp = list(host.name = "aspmx.l.google.com", port = 25),
+          headers = list("X-Department" = "Finance", "X-Source" = "Automated report"),
+          authenticate = FALSE,
+          send = TRUE)
+```
+
+This will result in additional headers added to your email as below:
+```
+X-Department: Finance
+X-Source: Automated report
+```
+
 MS Exchange server
 ==================
-Two mailR users confirmed being able to send emails via Exchange using the following code:
+Provided you have the correct SMTP settings, mailR plays well with MS Exchange. Two mailR users confirmed being able to send emails via Exchange using the following code. I also successfully use mailR at work connecting to MS Exchange.
 ```R
 send.mail(from = from,
           to = to,
@@ -145,7 +175,7 @@ send.mail(from = from,
 
 Sending HTML files compiled using Markdown
 ==========================================
-mailR does not currently support resolving inline images encoded using the [data URI scheme](http://en.wikipedia.org/wiki/Data_URI_scheme). Use the workaround below instead:
+mailR does not currently support resolving inline images encoded using the [data URI scheme](https://en.wikipedia.org/wiki/Data_URI_scheme). Use the workaround below instead:
 
 First off, create the HTML file from the R terminal (the important thing here is that options does not include "base64_images" --- see `?markdown::markdownHTMLOptions`):
 ```R
@@ -166,12 +196,48 @@ send.mail(from = "sender@gmail.com",
           send = TRUE)
 ```
 
-Issues/Contibutions
+mailR equivalent of "Blue Screen of Death"
+==========================================
+Many folks have run into this error using mailR: `Error in ls(envir = envir, all.names = private)`.
+
+The source of the problem most likely lies in the connection to the SMTP server. This could either be due to incorrect settings (someone confirmed trying several servers at work until finally discovering the one playing well with mailR) or be a proxy issue. Turn on the `debug` parameter to get more pointers to resolving your problem.
+
+While I will do my best to support you, there is little I can do remotely if you fall into this trap.
+
+Issues/Contributions
 ===================
-Happy to hear about issues you encounter using mailR via Github's [issue tracker](https://github.com/rpremraj/mailR/issues/new).
+Please post any issues encountered using mailR to the [issue tracker](https://github.com/rpremrajGit/mailR/issues).
+
+If you would like to submit a patch to improve mailR, please send a pull request to the *develop branch*.
 
 Change log
 ===================
+
+What's new in version 0.6
+-------------------------
+**18th January 2016**
+
+*Enhancements*
+- Refinement to the stripped down text version of HTML emails for incompatible clients (thanks to @dtenenba)
+- Ability to add email headers by passing a named list `headers` (thanks to @dtenenba)
+
+**6th December 2015**
+
+*Enhancements*
+- Better handling of errors thrown by Java (thanks to @chlorenz)
+- Email clients unable to view HTML emails now receive stripped down version of message (Fixes #24)
+
+**30th December 2014**
+
+*Features*
+- Attach files to the email using URLs, e.g., you can send files from your Dropbox public folder using the URL.
+- A 'debug' parameter to set that will make send.mail() provide a detailed log.
+- Option to set a email address to reply to using the 'replyTo' parameter.
+
+*Enhancement*
+- Upgraded Commons Email Jar to version 1.3.3
+- Upgraded Javax.mail Jar to version 1.5.2
+
 **08th September 2014**
 
 *Enhancement*
